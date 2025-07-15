@@ -136,6 +136,34 @@ POST /vendas/finalizarVenda/{id}?metodo=DINHEIRO
 DELETE /vendas/cancelarVenda/{id}
 ```
 
+#### Listar Todas as Vendas
+GET /vendas/listar
+
+Retorna uma lista com todas as vendas cadastradas.
+
+Exemplo de resposta:
+```json
+[
+  {
+    "id": 1,
+    "dataHora": "2024-07-10T14:30:00",
+    "metodoPagamento": "DINHEIRO",
+    "itens": [
+      {
+        "id": 1,
+        "produto": {
+          "id": 1,
+          "nomeDoProduto": "Notebook Dell",
+          "codigoBarras": "7891234567890"
+        },
+        "quantidade": 1,
+        "precoUnitario": 2999.99
+      }
+    ]
+  }
+]
+```
+
 ### Relatórios
 
 #### Relatório Detalhado (JSON)
@@ -218,48 +246,4 @@ logging.level.org.hibernate.SQL=DEBUG
 - `venda`: Registro de vendas
 - `venda_produto`: Itens das vendas
 
-## 🚀 Melhorias Implementadas
 
-### ✅ Tratamento de Erros
-- Exceções customizadas
-- Handler global de exceções
-- Respostas padronizadas
-- Logs detalhados
-
-### ✅ Validação
-- Bean Validation
-- DTOs com validações
-- Mensagens de erro claras
-
-### ✅ Logging
-- Logs estruturados
-- Diferentes níveis de log
-- Informações de auditoria
-
-### ✅ Documentação
-- README completo
-- Exemplos de uso
-- Documentação da API
-
-### ✅ Configurações
-- CORS configurado
-- Propriedades organizadas
-- Configurações de segurança
-
-## 🤝 Contribuição
-
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature
-3. Commit suas mudanças
-4. Push para a branch
-5. Abra um Pull Request
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
-## 📞 Suporte
-
-Para dúvidas ou suporte, entre em contato:
-- Email: contato@sistema.com
-- Issues: [GitHub Issues](https://github.com/seu-usuario/produtos/issues) 

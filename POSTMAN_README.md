@@ -52,11 +52,11 @@ A coleção usa as seguintes variáveis:
 - **Adicionar Produto**: `POST /vendas/adicionarProdutoVenda/{id}`
 - **Finalizar Venda**: `POST /vendas/finalizarVenda/{id}`
 - **Cancelar Venda**: `DELETE /vendas/cancelarVenda/{id}`
+- **Listar Todas as Vendas**: `GET /vendas/listar`
+- **Relatório Detalhado de Vendas (JSON)**: `GET /relatorios/detalhado/?dataInicio=2024-01-01&dataFim=2024-01-31`
+- **Relatório Detalhado de Vendas(Excel)**: `GET /relatorios/detalhado/excel/?dataInicio=2024-01-01&dataFim=2024-01-31`
+- **Relatório Detalhado de Vendas (PDF)**: `GET /relatorios/detalhado/pdf/?dataInicio=2024-01-01&dataFim=2024-01-31`
 
-### 📊 Relatórios
-- **Relatório Detalhado (JSON)**: `GET /relatorios/detalhado`
-- **Relatório Detalhado (Excel)**: `GET /relatorios/detalhado/excel`
-- **Relatório Detalhado (PDF)**: `GET /relatorios/detalhado/pdf`
 
 ## 🧪 Como Testar
 

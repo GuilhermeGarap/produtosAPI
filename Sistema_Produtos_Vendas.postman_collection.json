@@ -860,6 +860,41 @@
 							"body": "Venda cancelada e estoque ajustado."
 						}
 					]
+				},
+				{
+					"name": "Listar Todas as Vendas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/vendas/listar",
+							"host": ["{{base_url}}"],
+							"path": ["vendas", "listar"]
+						},
+						"description": "Lista todas as vendas cadastradas no sistema"
+					},
+					"response": [
+						{
+							"name": "Sucesso",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/vendas/listar",
+									"host": ["{{base_url}}"],
+									"path": ["vendas", "listar"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{"key": "Content-Type", "value": "application/json"}
+							],
+							"cookie": [],
+							"body": "[\n  {\n    \"id\": 1,\n    \"dataHora\": \"2024-07-10T14:30:00\",\n    \"metodoPagamento\": \"DINHEIRO\",\n    \"itens\": [\n      {\n        \"id\": 1,\n        \"produto\": {\n          \"id\": 1,\n          \"nomeDoProduto\": \"Notebook Dell\",\n          \"codigoBarras\": \"7891234567890\"\n        },\n        \"quantidade\": 1,\n        \"precoUnitario\": 2999.99\n      }\n    ]\n  }\n]"
+						}
+					]
 				}
 			],
 			"description": "Endpoints para gerenciamento de vendas"

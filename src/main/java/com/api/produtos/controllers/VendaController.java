@@ -17,6 +17,8 @@ import com.api.produtos.services.VendaService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/vendas")
 public class VendaController {
@@ -34,6 +36,12 @@ public class VendaController {
     public ResponseEntity<Venda> buscar(@PathVariable Long id) {
         Venda venda = vendaService.buscarVenda(id);
         return ResponseEntity.ok(venda);
+    }
+
+    @GetMapping("/listar")
+    public ResponseEntity<List<Venda>> listarTodasVendas() {
+        List<Venda> vendas = vendaService.listarTodasVendas();
+        return ResponseEntity.ok(vendas);
     }
 
     @PostMapping("/adicionarProdutoVenda/{id}")

@@ -1,6 +1,7 @@
 package com.api.produtos.services;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -124,5 +125,10 @@ public class VendaService {
         // Apagar os itens da venda (por cascade, deve apagar tudo)
         vendaRepo.delete(venda);
         logger.info("Venda {} cancelada e estoque ajustado", id);
+    }
+
+    public List<Venda> listarTodasVendas() {
+        logger.info("Listando todas as vendas");
+        return vendaRepo.findAll();
     }
 }
