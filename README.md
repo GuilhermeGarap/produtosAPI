@@ -99,6 +99,16 @@ Content-Type: application/json
 }
 ```
 
+#### Excluir Produto
+```http
+DELETE /produtos/deletar/{id}
+```
+Remove um produto do sistema pelo seu ID.
+- O produto será removido de todas as vendas existentes.
+- Se uma venda ficar sem itens após a exclusão, ela será automaticamente removida do sistema.
+- Resposta: 204 No Content (sucesso)
+- Erros: 404 Produto não encontrado
+
 #### Relatório de Estoque (Excel)
 ```http
 GET /produtos/estoque/excel

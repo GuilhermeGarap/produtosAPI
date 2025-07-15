@@ -143,6 +143,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 
+    @ExceptionHandler(ProdutoNaoPodeSerExcluidoException.class)
+    public ResponseEntity<ErrorResponse> handleProdutoNaoPodeSerExcluidoException(ProdutoNaoPodeSerExcluidoException ex) {
+        ErrorResponse error = new ErrorResponse(
+            HttpStatus.CONFLICT.value(),
+            "Produto não pode ser excluído",
+            ex.getMessage(),
+            LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
     // Classes internas para resposta de erro
     public static class ErrorResponse {
         private int status;

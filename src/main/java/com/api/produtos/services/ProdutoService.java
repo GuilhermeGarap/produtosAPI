@@ -5,12 +5,16 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.api.produtos.domain.produto.Produto;
 import com.api.produtos.domain.produto.ProdutoRepository;
+import com.api.produtos.domain.venda.Venda;
+import com.api.produtos.domain.venda.VendaRepository;
 import com.api.produtos.exceptions.CodigoBarrasDuplicadoException;
 import com.api.produtos.exceptions.EstoqueInsuficienteException;
+import com.api.produtos.exceptions.ProdutoNaoPodeSerExcluidoException;
 import com.api.produtos.exceptions.ProdutoNotFoundException;
 
 import jakarta.transaction.Transactional;
@@ -22,6 +26,10 @@ public class ProdutoService {
 
     @Autowired
     private ProdutoRepository produtoRepository;
+    @Autowired
+    private com.api.produtos.domain.vendaproduto.VendaProdutoRepository vendaProdutoRepository;
+    @Autowired
+    private VendaRepository vendaRepository;
 
     // Buscar todos os produtos
     public List<Produto> listarProdutos() {
@@ -96,6 +104,41 @@ public class ProdutoService {
         Produto produtoEditado = produtoRepository.save(produto);
         logger.info("Produto editado com sucesso: {}", produto.getNomeDoProduto());
         return produtoEditado;
+    }
+
+    //Deletar produto
+    @Transactional
+    public void deletarProduto(Long produtoId) {
+        logger.info("Deletando produto com ID: {}", produtoId);
+        Produto produto = produtoRepository.findById(produtoId)
+            .orElseThrow(() -> new ProdutoNotFoundException(produtoId));
+        try {
+            // Remove todos os itens de venda que referenciam este produto
+            var itens = vendaProdutoRepository.findByProduto(produto);
+            vendaProdutoRepository.deleteAll(itens);
+            vendaProdutoRepository.flush(); // Força sincronização com o banco
+            logger.info("Itens de venda removidos para o produto {}: {}", produtoId, itens.size());
+            // Após remover os itens, recarregar vendas do banco e deletar as que ficaram sem itens
+            List<Venda> todasVendas = vendaRepository.findAll();
+            int vendasRemovidas = 0;
+            for (Venda venda : todasVendas) {
+                Venda vendaAtualizada = vendaRepository.findById(venda.getId()).orElse(null);
+                if (vendaAtualizada != null && (vendaAtualizada.getItens() == null || vendaAtualizada.getItens().isEmpty())) {
+                    vendaRepository.delete(vendaAtualizada);
+                    vendasRemovidas++;
+                }
+            }
+            logger.info("Vendas removidas por ficarem sem itens: {}", vendasRemovidas);
+            // Por fim, remover o produto
+            produtoRepository.delete(produto);
+            logger.info("Produto deletado com sucesso: ID={}", produtoId);
+        } catch (DataIntegrityViolationException e) {
+            logger.error("Erro de integridade ao deletar produto {}: {}", produtoId, e.getMessage());
+            throw new ProdutoNaoPodeSerExcluidoException(produtoId);
+        } catch (Exception e) {
+            logger.error("Erro inesperado ao deletar produto {}: {}", produtoId, e.getMessage(), e);
+            throw e;
+        }
     }
 }
 

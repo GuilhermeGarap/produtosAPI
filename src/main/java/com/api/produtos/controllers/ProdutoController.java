@@ -16,6 +16,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -92,6 +93,12 @@ public class ProdutoController {
         return ResponseEntity.ok(produto);
     }
 
+    @DeleteMapping("deletar/{id}")
+    public ResponseEntity<Void> deletarProduto(@PathVariable Long id) {
+        service.deletarProduto(id);
+        return ResponseEntity.noContent().build();
+    }
+    
     @GetMapping("/estoque/excel")
     public void exportarEstoqueExcel(HttpServletResponse response) throws IOException {
         List<Produto> produtos = repository.findAll();

@@ -122,7 +122,7 @@ public class VendaService {
                        produto.getNomeDoProduto(), estoqueAnterior, produto.getDisponivelEmEstoque());
         }
 
-        // Apagar os itens da venda (por cascade, deve apagar tudo)
+        // Apaga os itens da venda
         vendaRepo.delete(venda);
         logger.info("Venda {} cancelada e estoque ajustado", id);
     }

@@ -39,7 +39,7 @@ public class Produto {
         this.nomeDoProduto = dados.nomeDoProduto();
         this.codigoBarras = dados.codigoBarras();
         this.precoVenda = dados.precoVenda();
-        this.precoCusto = dados.precoCusto();
+        this.precoCusto = dados.precoCusto(); 
         this.disponivelEmEstoque = dados.disponivelEmEstoque();
     }
 
