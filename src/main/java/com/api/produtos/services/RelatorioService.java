@@ -27,7 +27,11 @@ public class RelatorioService {
         LocalDateTime inicio = dataInicio.atStartOfDay();
         LocalDateTime fim = dataFim.atTime(LocalTime.MAX);
 
-        List<Venda> vendas = vendaRepository.buscarVendasComItensPorPeriodo(inicio, fim);
+        List<Venda> vendas = vendaRepository.buscarVendasComItensPorPeriodo(inicio, fim)
+            .stream()
+            .filter(v -> v.getItens() != null && !v.getItens().isEmpty())
+            .filter(v -> v.getMetodoPagamento() != null && v.getMetodoPagamento() != Venda.MetodoPagamento.SEM_PAGAMENTO)
+            .collect(Collectors.toList());
 
         return vendas.stream().map(v -> {
             List<RelatorioVendaDiaItemDTO> itensDTO = v.getItens().stream().map(item -> new RelatorioVendaDiaItemDTO(

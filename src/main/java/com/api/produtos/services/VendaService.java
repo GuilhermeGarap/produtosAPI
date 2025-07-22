@@ -131,4 +131,14 @@ public class VendaService {
         logger.info("Listando todas as vendas");
         return vendaRepo.findAll();
     }
+
+    @Transactional
+    public int deletarVendasVaziasAntigas() {
+        LocalDateTime limite = LocalDateTime.now().minusMinutes(10);
+        List<Venda> vendasAntigas = vendaRepo.findAll().stream()
+            .filter(v -> (v.getItens() == null || v.getItens().isEmpty()) && v.getDataHora().isBefore(limite))
+            .toList();
+        vendasAntigas.forEach(vendaRepo::delete);
+        return vendasAntigas.size();
+    }
 }
