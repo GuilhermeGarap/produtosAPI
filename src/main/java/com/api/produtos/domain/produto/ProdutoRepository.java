@@ -11,6 +11,10 @@ import com.api.produtos.domain.relatorio.RelatorioEstoqueDTO;
 public interface ProdutoRepository extends JpaRepository<Produto, Long>{
     Optional<Produto> findByCodigoBarras(String codigoBarras);
 
+    // Buscar apenas produtos ativos (não removidos)
+    @Query("SELECT p FROM Produto p WHERE p.codigoBarras NOT LIKE 'removido_%'")
+    List<Produto> findProdutosAtivos();
+
 @Query("""
     SELECT new com.api.produtos.domain.relatorio.RelatorioEstoqueDTO(
         p.nomeDoProduto,
@@ -18,6 +22,7 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long>{
         p.disponivelEmEstoque
     )
     FROM Produto p
+    WHERE p.codigoBarras NOT LIKE 'removido_%'
 """)
 List<RelatorioEstoqueDTO> gerarRelatorioEstoque();
 

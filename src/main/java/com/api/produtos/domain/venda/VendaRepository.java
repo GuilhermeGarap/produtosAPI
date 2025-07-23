@@ -48,8 +48,7 @@ public interface VendaRepository extends JpaRepository<Venda, Long> {
     """)
     List<RelatorioVendaAgrupadoPorProduto> findRelatorioVendasAgrupadoPorData(@Param("data") LocalDate data);
 
-
-
-
-
+    @EntityGraph(attributePaths = {"itens", "itens.produto"})
+    @Query("SELECT v FROM Venda v WHERE v.dataHora BETWEEN :inicio AND :fim AND v.finalizada = true ORDER BY v.dataHora DESC")
+    List<Venda> findByDataHoraBetweenAndFinalizadaTrue(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
 }

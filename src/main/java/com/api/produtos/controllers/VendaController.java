@@ -1,5 +1,7 @@
 package com.api.produtos.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,8 +18,6 @@ import com.api.produtos.services.VendaService;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/vendas")
@@ -47,8 +47,9 @@ public class VendaController {
     @PostMapping("/adicionarProdutoVenda/{id}")
     public ResponseEntity<Venda> adicionarProduto(
             @PathVariable Long id, 
-            @RequestParam @NotBlank(message = "Código do produto é obrigatório") String codigo) {
-        Venda atualizada = vendaService.adicionarProdutoNaVenda(id, codigo);
+            @RequestParam @NotBlank(message = "Código do produto é obrigatório") String codigo,
+            @RequestParam(defaultValue = "1") int quantidade) {
+        Venda atualizada = vendaService.adicionarProdutoNaVenda(id, codigo, quantidade);
         return ResponseEntity.ok(atualizada);
     }
 
@@ -58,6 +59,7 @@ public class VendaController {
             @RequestParam @NotNull(message = "Método de pagamento é obrigatório") MetodoPagamento metodo) {
         Venda venda = vendaService.buscarVenda(id);
         venda.setMetodoPagamento(metodo);
+        venda.setFinalizada(true);
         vendaService.salvarVenda(venda);
         return ResponseEntity.ok(venda);
     }
@@ -66,5 +68,19 @@ public class VendaController {
     public ResponseEntity<String> cancelarVenda(@PathVariable Long id) {
         vendaService.cancelarVenda(id);
         return ResponseEntity.ok("Venda cancelada e estoque ajustado.");
+    }
+
+    @DeleteMapping("/removerProdutoVenda/{id}")
+    public ResponseEntity<Venda> removerProduto(
+            @PathVariable Long id, 
+            @RequestParam @NotBlank(message = "Código do produto é obrigatório") String codigo) {
+        Venda atualizada = vendaService.removerProdutoDaVenda(id, codigo);
+        return ResponseEntity.ok(atualizada);
+    }
+
+    @GetMapping("/vendasHoje")
+    public ResponseEntity<List<Venda>> vendasHoje() {
+        List<Venda> vendas = vendaService.buscarVendasHoje();
+        return ResponseEntity.ok(vendas);
     }
 }

@@ -45,8 +45,8 @@ public class VendaService {
     }
 
     @Transactional
-    public Venda adicionarProdutoNaVenda(Long vendaId, String codigoBarras) {
-        logger.info("Adicionando produto {} na venda {}", codigoBarras, vendaId);
+    public Venda adicionarProdutoNaVenda(Long vendaId, String codigoBarras, int quantidade) {
+        logger.info("Adicionando produto {} na venda {} com quantidade {}", codigoBarras, vendaId, quantidade);
         
         Venda venda = vendaRepo.findById(vendaId)
                 .orElseThrow(() -> new VendaNotFoundException(vendaId));
@@ -54,36 +54,78 @@ public class VendaService {
         Produto produto = produtoRepo.findByCodigoBarras(codigoBarras)
                 .orElseThrow(() -> new ProdutoNotFoundException(codigoBarras, "código de barras"));
 
-        if (produto.getDisponivelEmEstoque() <= 0) {
-            logger.warn("Tentativa de adicionar produto sem estoque: produto={}, estoque={}", 
-                       produto.getNomeDoProduto(), produto.getDisponivelEmEstoque());
+        if (produto.getDisponivelEmEstoque() < quantidade) {
+            logger.warn("Tentativa de adicionar produto com estoque insuficiente: produto={}, estoque={}, quantidade={}", 
+                       produto.getNomeDoProduto(), produto.getDisponivelEmEstoque(), quantidade);
             throw new EstoqueInsuficienteException(produto.getNomeDoProduto(), 
-                                                  produto.getDisponivelEmEstoque(), 1);
+                                                  produto.getDisponivelEmEstoque(), quantidade);
         }
 
         Optional<VendaProduto> itemExistente = itemRepo.findByVendaAndProduto(venda, produto);
 
         if (itemExistente.isPresent()) {
             VendaProduto item = itemExistente.get();
-            item.setQuantidade(item.getQuantidade() + 1);
+            item.setQuantidade(item.getQuantidade() + quantidade);
             itemRepo.save(item);
-            logger.info("Quantidade do produto {} aumentada na venda {}", 
-                       produto.getNomeDoProduto(), vendaId);
+            logger.info("Quantidade do produto {} aumentada na venda {} em {} unidades", 
+                       produto.getNomeDoProduto(), vendaId, quantidade);
         } else {
             VendaProduto novo = new VendaProduto();
             novo.setVenda(venda);
             novo.setProduto(produto);
-            novo.setQuantidade(1);
+            novo.setQuantidade(quantidade);
             novo.setPrecoUnitario(produto.getPrecoVenda());
             itemRepo.save(novo);
-            logger.info("Produto {} adicionado pela primeira vez na venda {}", 
-                       produto.getNomeDoProduto(), vendaId);
+            logger.info("Produto {} adicionado pela primeira vez na venda {} com {} unidades", 
+                       produto.getNomeDoProduto(), vendaId, quantidade);
         }
 
-        produto.setDisponivelEmEstoque(produto.getDisponivelEmEstoque() - 1);
+        produto.setDisponivelEmEstoque(produto.getDisponivelEmEstoque() - quantidade);
         produtoRepo.save(produto);
         logger.info("Estoque do produto {} reduzido para {}", 
                    produto.getNomeDoProduto(), produto.getDisponivelEmEstoque());
+
+        return vendaRepo.findById(vendaId).get();
+    }
+
+    @Transactional
+    public Venda removerProdutoDaVenda(Long vendaId, String codigoBarras) {
+        logger.info("Removendo produto {} da venda {}", codigoBarras, vendaId);
+        
+        Venda venda = vendaRepo.findById(vendaId)
+                .orElseThrow(() -> new VendaNotFoundException(vendaId));
+
+        Produto produto = produtoRepo.findByCodigoBarras(codigoBarras)
+                .orElseThrow(() -> new ProdutoNotFoundException(codigoBarras, "código de barras"));
+
+        Optional<VendaProduto> itemExistente = itemRepo.findByVendaAndProduto(venda, produto);
+
+        if (itemExistente.isPresent()) {
+            VendaProduto item = itemExistente.get();
+            
+            if (item.getQuantidade() > 1) {
+                // Diminuir quantidade
+                item.setQuantidade(item.getQuantidade() - 1);
+                itemRepo.save(item);
+                logger.info("Quantidade do produto {} diminuída na venda {}", 
+                           produto.getNomeDoProduto(), vendaId);
+            } else {
+                // Remover item completamente
+                itemRepo.delete(item);
+                logger.info("Produto {} removido completamente da venda {}", 
+                           produto.getNomeDoProduto(), vendaId);
+            }
+
+            // Repor estoque
+            produto.setDisponivelEmEstoque(produto.getDisponivelEmEstoque() + 1);
+            produtoRepo.save(produto);
+            logger.info("Estoque do produto {} reposto para {}", 
+                       produto.getNomeDoProduto(), produto.getDisponivelEmEstoque());
+        } else {
+            logger.warn("Tentativa de remover produto inexistente na venda: produto={}, venda={}", 
+                       produto.getNomeDoProduto(), vendaId);
+            throw new RuntimeException("Produto não encontrado na venda");
+        }
 
         return vendaRepo.findById(vendaId).get();
     }
@@ -130,6 +172,13 @@ public class VendaService {
     public List<Venda> listarTodasVendas() {
         logger.info("Listando todas as vendas");
         return vendaRepo.findAll();
+    }
+
+    public List<Venda> buscarVendasHoje() {
+        LocalDateTime hoje = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime amanha = hoje.plusDays(1);
+        logger.info("Buscando vendas de hoje: {} até {}", hoje, amanha);
+        return vendaRepo.findByDataHoraBetweenAndFinalizadaTrue(hoje, amanha);
     }
 
     @Transactional

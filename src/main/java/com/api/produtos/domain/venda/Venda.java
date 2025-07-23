@@ -44,6 +44,8 @@ public class Venda {
 
     @Enumerated(EnumType.STRING)
     private MetodoPagamento metodoPagamento;
+
+    private Boolean finalizada = false;
     public BigDecimal gerarTotal() {
         return itens.stream()
                 .map(item -> item.getPrecoUnitario().multiply(BigDecimal.valueOf(item.getQuantidade())))

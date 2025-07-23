@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service;
 
 import com.api.produtos.domain.produto.Produto;
 import com.api.produtos.domain.produto.ProdutoRepository;
-import com.api.produtos.domain.venda.Venda;
-import com.api.produtos.domain.venda.VendaRepository;
 import com.api.produtos.exceptions.CodigoBarrasDuplicadoException;
 import com.api.produtos.exceptions.EstoqueInsuficienteException;
 import com.api.produtos.exceptions.ProdutoNaoPodeSerExcluidoException;
@@ -28,14 +26,12 @@ public class ProdutoService {
     private ProdutoRepository produtoRepository;
     @Autowired
     private com.api.produtos.domain.vendaproduto.VendaProdutoRepository vendaProdutoRepository;
-    @Autowired
-    private VendaRepository vendaRepository;
 
-    // Buscar todos os produtos
+    // Buscar todos os produtos ativos
     public List<Produto> listarProdutos() {
-        logger.info("Listando todos os produtos");
-        List<Produto> produtos = produtoRepository.findAll();
-        logger.info("Encontrados {} produtos", produtos.size());
+        logger.info("Listando produtos ativos");
+        List<Produto> produtos = produtoRepository.findProdutosAtivos();
+        logger.info("Encontrados {} produtos ativos", produtos.size());
         return produtos;
     }
 
@@ -113,23 +109,30 @@ public class ProdutoService {
         Produto produto = produtoRepository.findById(produtoId)
             .orElseThrow(() -> new ProdutoNotFoundException(produtoId));
         try {
-            // Remove todos os itens de venda que referenciam este produto
+            // Criar produto genérico específico para este produto removido
+            String codigoGenerico = "removido_" + produto.getCodigoBarras();
+            String nomeGenerico = "Produto Removido (" + produto.getNomeDoProduto() + ")";
+            
+            Produto produtoGenerico = produtoRepository.findByCodigoBarras(codigoGenerico)
+                .orElseGet(() -> {
+                    Produto novo = new Produto();
+                    novo.setNomeDoProduto(nomeGenerico);
+                    novo.setCodigoBarras(codigoGenerico);
+                    novo.setPrecoVenda(java.math.BigDecimal.ZERO);
+                    novo.setPrecoCusto(java.math.BigDecimal.ZERO);
+                    novo.setDisponivelEmEstoque(0);
+                    return produtoRepository.save(novo);
+                });
+            
+            // Substituir referência do produto em todas as vendas pelo produto genérico
             var itens = vendaProdutoRepository.findByProduto(produto);
-            vendaProdutoRepository.deleteAll(itens);
-            vendaProdutoRepository.flush(); // Força sincronização com o banco
-            logger.info("Itens de venda removidos para o produto {}: {}", produtoId, itens.size());
-            // Após remover os itens, recarregar vendas do banco e deletar as que ficaram sem itens
-            List<Venda> todasVendas = vendaRepository.findAll();
-            int vendasRemovidas = 0;
-            for (Venda venda : todasVendas) {
-                Venda vendaAtualizada = vendaRepository.findById(venda.getId()).orElse(null);
-                if (vendaAtualizada != null && (vendaAtualizada.getItens() == null || vendaAtualizada.getItens().isEmpty())) {
-                    vendaRepository.delete(vendaAtualizada);
-                    vendasRemovidas++;
-                }
+            for (var item : itens) {
+                item.setProduto(produtoGenerico);
+                vendaProdutoRepository.save(item);
             }
-            logger.info("Vendas removidas por ficarem sem itens: {}", vendasRemovidas);
-            // Por fim, remover o produto
+            logger.info("Referências do produto {} substituídas pelo produto genérico em {} itens", produtoId, itens.size());
+            
+            // Por fim, remover o produto original
             produtoRepository.delete(produto);
             logger.info("Produto deletado com sucesso: ID={}", produtoId);
         } catch (DataIntegrityViolationException e) {

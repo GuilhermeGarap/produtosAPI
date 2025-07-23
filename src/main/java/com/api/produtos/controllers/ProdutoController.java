@@ -68,7 +68,7 @@ public class ProdutoController {
 
     @GetMapping("/listar")
     public ResponseEntity<List<DadosListaProduto>> listar() {
-        List<Produto> produtos = repository.findAll();
+        List<Produto> produtos = service.listarProdutos();
 
         List<DadosListaProduto> dadosProdutos = produtos.stream().map(DadosListaProduto::new).collect(Collectors.toList());
 
