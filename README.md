@@ -1,4 +1,4 @@
-# 🛍️ Sistema de Produtos e Vendas Doces Isabely
+# 🛍️ Sistema de Venda e Estoque
 
 Sistema completo para gerenciamento de produtos, vendas e relatórios desenvolvido em Spring Boot.
 
@@ -68,11 +68,11 @@ POST /produtos/cadastrar
 Content-Type: application/json
 
 {
-  "nomeDoProduto": "Pé de Moleque Caseiro",
+  "nomeDoProduto": "Smartphone Samsung Galaxy S23",
   "codigoBarras": "7891234567890",
-  "precoVenda": 12.50,
-  "precoCusto": 8.00,
-  "disponivelEmEstoque": 50
+  "precoVenda": 2999.99,
+  "precoCusto": 2500.00,
+  "disponivelEmEstoque": 15
 }
 ```
 
@@ -92,10 +92,10 @@ PUT /produtos/editar/{id}
 Content-Type: application/json
 
 {
-  "nomeDoProduto": "Pé de Moleque Caseiro Especial",
+  "nomeDoProduto": "Smartphone Samsung Galaxy S23 Plus",
   "codigoBarras": "7891234567890",
-  "precoVenda": 15.00,
-  "precoCusto": 10.00
+  "precoVenda": 3499.99,
+  "precoCusto": 3000.00
 }
 ```
 
@@ -179,11 +179,11 @@ Exemplo de resposta:
         "id": 1,
         "produto": {
           "id": 1,
-          "nomeDoProduto": "Pé de Moleque Caseiro",
+          "nomeDoProduto": "Smartphone Samsung Galaxy S23",
           "codigoBarras": "7891234567890"
         },
-        "quantidade": 3,
-        "precoUnitario": 12.50
+        "quantidade": 1,
+        "precoUnitario": 2999.99
       }
     ]
   }
