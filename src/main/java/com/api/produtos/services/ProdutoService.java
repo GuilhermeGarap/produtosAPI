@@ -27,7 +27,6 @@ public class ProdutoService {
     @Autowired
     private com.api.produtos.domain.vendaproduto.VendaProdutoRepository vendaProdutoRepository;
 
-    // Buscar todos os produtos ativos
     public List<Produto> listarProdutos() {
         logger.info("Listando produtos ativos");
         List<Produto> produtos = produtoRepository.findProdutosAtivos();
@@ -35,7 +34,6 @@ public class ProdutoService {
         return produtos;
     }
 
-    // Cadastrar novo produto
     @Transactional
     public Produto cadastrarProduto(Produto produto) {
         logger.info("Cadastrando novo produto: {}", produto.getNomeDoProduto());
@@ -51,7 +49,6 @@ public class ProdutoService {
         return produtoSalvo;
     }
 
-    // Atualizar estoque
     @Transactional
     public Produto atualizarEstoque(Long produtoId, int quantidadeAlterada) {
         logger.info("Atualizando estoque do produto {} com quantidade {}", produtoId, quantidadeAlterada);
@@ -76,7 +73,6 @@ public class ProdutoService {
         return produtoAtualizado;
     }
 
-    // Editar dados do produto
     @Transactional
     public Produto editarProduto(Long produtoId, Produto dadosAtualizados) {
         logger.info("Editando produto com ID: {}", produtoId);
@@ -102,7 +98,6 @@ public class ProdutoService {
         return produtoEditado;
     }
 
-    //Deletar produto
     @Transactional
     public void deletarProduto(Long produtoId) {
         logger.info("Deletando produto com ID: {}", produtoId);
@@ -124,7 +119,6 @@ public class ProdutoService {
                     return produtoRepository.save(novo);
                 });
             
-            // Substituir referência do produto em todas as vendas pelo produto genérico
             var itens = vendaProdutoRepository.findByProduto(produto);
             for (var item : itens) {
                 item.setProduto(produtoGenerico);
@@ -132,7 +126,6 @@ public class ProdutoService {
             }
             logger.info("Referências do produto {} substituídas pelo produto genérico em {} itens", produtoId, itens.size());
             
-            // Por fim, remover o produto original
             produtoRepository.delete(produto);
             logger.info("Produto deletado com sucesso: ID={}", produtoId);
         } catch (DataIntegrityViolationException e) {

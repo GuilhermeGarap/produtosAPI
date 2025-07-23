@@ -11,7 +11,6 @@ public class VendaCleanupScheduler {
         this.vendaService = vendaService;
     }
 
-    // Executa a cada minuto
     @Scheduled(fixedRate = 60000)
     public void limparVendasVaziasAntigas() {
         int removidas = vendaService.deletarVendasVaziasAntigas();

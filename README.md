@@ -1,4 +1,4 @@
-# 🛍️ Sistema de Produtos e Vendas
+# 🛍️ Sistema de Produtos e Vendas Doces Isabely
 
 Sistema completo para gerenciamento de produtos, vendas e relatórios desenvolvido em Spring Boot.
 
@@ -68,11 +68,11 @@ POST /produtos/cadastrar
 Content-Type: application/json
 
 {
-  "nomeDoProduto": "TV Samsung 55\"",
+  "nomeDoProduto": "Pé de Moleque Caseiro",
   "codigoBarras": "7891234567890",
-  "precoVenda": 2999.99,
-  "precoCusto": 2500.00,
-  "disponivelEmEstoque": 10
+  "precoVenda": 12.50,
+  "precoCusto": 8.00,
+  "disponivelEmEstoque": 50
 }
 ```
 
@@ -92,10 +92,10 @@ PUT /produtos/editar/{id}
 Content-Type: application/json
 
 {
-  "nomeDoProduto": "TV Samsung 55\" 4K",
+  "nomeDoProduto": "Pé de Moleque Caseiro Especial",
   "codigoBarras": "7891234567890",
-  "precoVenda": 3299.99,
-  "precoCusto": 2800.00
+  "precoVenda": 15.00,
+  "precoCusto": 10.00
 }
 ```
 
@@ -147,9 +147,25 @@ DELETE /vendas/cancelarVenda/{id}
 ```
 
 #### Listar Todas as Vendas
+```http
 GET /vendas/listar
+```
 
 Retorna uma lista com todas as vendas cadastradas.
+
+#### Vendas do Dia
+```http
+GET /vendas/vendasHoje
+```
+
+Retorna uma lista com todas as vendas realizadas hoje.
+
+#### Remover Produto da Venda
+```http
+DELETE /vendas/removerProdutoVenda/{id}?codigo={codigo}
+```
+
+Remove um produto específico de uma venda.
 
 Exemplo de resposta:
 ```json
@@ -163,11 +179,11 @@ Exemplo de resposta:
         "id": 1,
         "produto": {
           "id": 1,
-          "nomeDoProduto": "Notebook Dell",
+          "nomeDoProduto": "Pé de Moleque Caseiro",
           "codigoBarras": "7891234567890"
         },
-        "quantidade": 1,
-        "precoUnitario": 2999.99
+        "quantidade": 3,
+        "precoUnitario": 12.50
       }
     ]
   }
@@ -179,6 +195,11 @@ Exemplo de resposta:
 #### Relatório Detalhado (JSON)
 ```http
 GET /relatorios/detalhado?dataInicio=2024-01-01&dataFim=2024-01-31
+```
+
+#### Relatório Detalhado do Dia (JSON)
+```http
+GET /relatorios/detalhado/dia?data=2024-01-15
 ```
 
 #### Relatório Detalhado (Excel)

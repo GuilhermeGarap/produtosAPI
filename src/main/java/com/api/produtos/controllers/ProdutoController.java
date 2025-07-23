@@ -106,7 +106,7 @@ public class ProdutoController {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Estoque de Produtos");
 
-        // Criar estilos
+        // Estilos
         CellStyle headerStyle = workbook.createCellStyle();
         Font headerFont = workbook.createFont();
         headerFont.setBold(true);
@@ -170,7 +170,6 @@ public class ProdutoController {
             cell5.setCellStyle(dataStyle);
         }
 
-        // Auto-dimensionar colunas
         for (int i = 0; i < colunas.length; i++) {
             sheet.autoSizeColumn(i);
             sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 500);
