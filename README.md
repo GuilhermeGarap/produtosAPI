@@ -40,7 +40,7 @@ Sistema completo para gerenciamento de produtos, vendas e relatórios desenvolvi
 
 1. **Clone o repositório**
 ```bash
-git clone <url-do-repositorio>
+git clone https://github.com/GuilhermeGarap/produtosAPI.git
 cd produtos
 ```
 
